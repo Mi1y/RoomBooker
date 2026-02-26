@@ -47,6 +47,9 @@ namespace RoomBooker.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(Booking booking)
         {
+            ModelState.Remove(nameof(Booking.Customer));
+            ModelState.Remove(nameof(Booking.Room));
+
             if (ModelState.IsValid)
             {
                 _context.Add(booking);
@@ -70,6 +73,9 @@ namespace RoomBooker.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, Booking booking)
         {
+            ModelState.Remove(nameof(Booking.Customer));
+            ModelState.Remove(nameof(Booking.Room));
+
             if (ModelState.IsValid)
             {
                 _context.Update(booking);

@@ -1,6 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc.ModelBinding.Validation;
-
-namespace RoomBooker.Models
+﻿namespace RoomBooker.Models
 {
     public class Booking
     {
@@ -11,10 +9,8 @@ namespace RoomBooker.Models
         public int CustomerId { get; set; }
         public int RoomId { get; set; }
 
-        [ValidateNever]
         public Customer Customer { get; set; } = null!;
 
-        [ValidateNever]
         public Room Room { get; set; } = null!;
     }
 }
