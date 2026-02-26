@@ -1,5 +1,5 @@
 <Solution>
-  <Project Path="RoomBooker Desktop/RoomBooker.Desktop.csproj" Id="3eb1e540-bf2a-4b7a-882a-e6a38e0b65a7" DisplayName="RoomBooker.desktop" />
+  <Project Path="RoomBooker Desktop/RoomBooker.desktop.csproj" Id="3eb1e540-bf2a-4b7a-882a-e6a38e0b65a7" />
   <Project Path="RoomBooker.shared/RoomBooker.shared.csproj" Id="63ffa815-1871-47cf-aba1-cfa7e6319550" />
   <Project Path="RoomBooker/RoomBooker.csproj" />
 </Solution>
