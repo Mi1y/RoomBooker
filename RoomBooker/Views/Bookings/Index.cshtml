@@ -1,0 +1,42 @@
+@model IEnumerable<Booking>
+@{
+    ViewData["Title"] = "Bookings";
+}
+
+<h2>Bookings</h2>
+<p>
+    <a asp-action="Create" class="btn btn-primary">+ New Booking</a>
+</p>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Customer</th>
+            <th>Room</th>
+            <th>Check-in</th>
+            <th>Check-out</th>
+            <th>Nights</th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var booking in Model)
+        {
+            var nights = booking.DateTo.HasValue && booking.DateFrom.HasValue
+                ? booking.DateTo.Value.DayNumber - booking.DateFrom.Value.DayNumber
+                : 0;
+            <tr>
+                <td>@booking.Customer?.Name</td>
+                <td>@booking.Room?.RoomNumber (@booking.Room?.Type)</td>
+                <td>@booking.DateFrom?.ToShortDateString()</td>
+                <td>@booking.DateTo?.ToShortDateString()</td>
+                <td>@nights</td>
+                <td>
+                    <a asp-action="Details" asp-route-id="@booking.Id" class="btn btn-sm btn-info">Details</a>
+                    <a asp-action="Edit" asp-route-id="@booking.Id" class="btn btn-sm btn-warning">Edit</a>
+                    <a asp-action="Delete" asp-route-id="@booking.Id" class="btn btn-sm btn-danger">Delete</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

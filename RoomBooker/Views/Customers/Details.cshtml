@@ -1,7 +1,7 @@
 ﻿@model Customer
 
 @{
-    ViewData["Title"] = "Customer Details | RoomBooker";
+    ViewData["Title"] = "Customer Details";
 }
 
 <h2>Customer Details</h2>
@@ -28,8 +28,8 @@
             @foreach (var booking in Model.Bookings)
             {
                 <tr>
-                    <td>@booking.DateFrom.ToShortDateString()</td>
-                    <td>@booking.DateTo.ToShortDateString()</td>
+                    <td>@booking.DateFrom?.ToShortDateString()</td>
+                    <td>@booking.DateTo?.ToShortDateString()</td>
                 </tr>
             }
         </tbody>

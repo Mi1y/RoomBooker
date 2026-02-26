@@ -1,8 +1,41 @@
 ﻿@{
-    ViewData["Title"] = "Home Page";
+    ViewData["Title"] = "Dashboard";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="text-center mb-4">
+    <h1 class="display-5">RoomBooker</h1>
+    <p class="text-muted">Hotel Reservation Management</p>
+</div>
+
+<div class="row g-4 justify-content-center">
+    <div class="col-md-4">
+        <div class="card text-center border-primary">
+            <div class="card-body">
+                <h1 class="display-4 text-primary">@ViewBag.CustomersCount</h1>
+                <h5 class="card-title">Customers</h5>
+                <a asp-controller="Customers" asp-action="Index" class="btn btn-primary">View All</a>
+                <a asp-controller="Customers" asp-action="Create" class="btn btn-outline-primary">+ Add</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card text-center border-success">
+            <div class="card-body">
+                <h1 class="display-4 text-success">@ViewBag.RoomsCount</h1>
+                <h5 class="card-title">Rooms</h5>
+                <a asp-controller="Rooms" asp-action="Index" class="btn btn-success">View All</a>
+                <a asp-controller="Rooms" asp-action="Create" class="btn btn-outline-success">+ Add</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card text-center border-warning">
+            <div class="card-body">
+                <h1 class="display-4 text-warning">@ViewBag.BookingsCount</h1>
+                <h5 class="card-title">Bookings</h5>
+                <a asp-controller="Bookings" asp-action="Index" class="btn btn-warning">View All</a>
+                <a asp-controller="Bookings" asp-action="Create" class="btn btn-outline-warning">+ Add</a>
+            </div>
+        </div>
+    </div>
 </div>
