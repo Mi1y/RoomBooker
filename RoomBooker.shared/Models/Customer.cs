@@ -8,5 +8,7 @@
         public string Phone { get; set; } = string.Empty;
 
         public ICollection<Booking> Bookings { get; set; } = new List<Booking>();
+
+        public override string ToString() => Name;
     }
 }
