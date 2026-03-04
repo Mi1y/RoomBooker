@@ -48,24 +48,27 @@ namespace RoomBooker.desktop.Controllers
         {
             _form.CustomerBindingSource.DataSource = _context.Customers.ToList();
             _form.RoomBindingSource.DataSource = _context.Rooms.ToList();
-            _form.BookingBindingSource.DataSource = _context.Bookings
+            var bookings = _context.Bookings
                 .Include(b => b.Customer)
                 .Include(b => b.Room)
                 .ToList();
+            _form.BookingBindingSource.DataSource = bookings;
         }
+
+        private enum GridType { Customers, Rooms, Bookings }
 
         private void SetupDataGridButtons()
         {
-            AddButtonColumns(_form.DataGridView1);
-            AddButtonColumns(_form.DataGridView2);
-            AddButtonColumns(_form.DataGridView3);
+            AddButtonColumns(_form.DataGridView1, GridType.Customers);
+            AddButtonColumns(_form.DataGridView2, GridType.Rooms);
+            AddButtonColumns(_form.DataGridView3, GridType.Bookings);
 
             AddButton(_form.TabPageCustomers, _form.BtnAdd_Click);
             AddButton(_form.TabPageRooms, _form.BtnAdd_Click);
             AddButton(_form.TabPageBookings, _form.BtnAdd_Click);
         }
 
-        private static void AddButtonColumns(DataGridView grid)
+        private static void AddButtonColumns(DataGridView grid, GridType gridType)
         {
             grid.Columns.Add(new DataGridViewButtonColumn
             {
@@ -85,6 +88,19 @@ namespace RoomBooker.desktop.Controllers
                 Width = 90,
                 FlatStyle = FlatStyle.Flat
             });
+
+            if (gridType != GridType.Bookings)
+            {
+                grid.Columns.Add(new DataGridViewButtonColumn
+                {
+                    Name = "colViewBookings",
+                    HeaderText = "",
+                    Text = "Bookings",
+                    UseColumnTextForButtonValue = true,
+                    Width = 80,
+                    FlatStyle = FlatStyle.Flat
+                });
+            }
         }
 
         private static void AddButton(TabPage tab, EventHandler handler)
@@ -172,6 +188,48 @@ namespace RoomBooker.desktop.Controllers
         public void Cleanup()
         {
             _context.Dispose();
+        }
+
+        public void ShowCustomerBookings(Customer customer)
+        {
+            var bookings = _customers.GetCustomerBookings(customer.Id);
+            if (bookings.Count == 0)
+            {
+                MessageBox.Show($"{customer.Name} has no bookings.", "Customer Bookings");
+                return;
+            }
+
+            var message = $"{customer.Name}'s Bookings:\n\n";
+            decimal totalAmount = 0;
+            foreach (var b in bookings)
+            {
+                message += $"Room {b.RoomNumber}: {b.DateFrom:dd MMM yyyy} to {b.DateTo:dd MMM yyyy} ({b.Duration} nights) - ${b.TotalPrice:F2}\n";
+                totalAmount += b.TotalPrice;
+            }
+            message += $"\nTotal Amount: ${totalAmount:F2}";
+            MessageBox.Show(message, "Customer Bookings");
+        }
+
+        public void ShowRoomBookings(Room room)
+        {
+            var count = _rooms.GetRoomBookingCount(room.ID);
+            var details = _rooms.GetRoomBookingDetails(room.ID);
+
+            if (count == 0)
+            {
+                MessageBox.Show($"Room {room.RoomNumber} has no bookings.", "Room Bookings");
+                return;
+            }
+
+            var message = $"Room {room.RoomNumber} - {count} booking(s):\n\n";
+            decimal totalRevenue = 0;
+            foreach (var b in details)
+            {
+                message += $"{b.CustomerName}: {b.DateFrom:dd MMM yyyy} to {b.DateTo:dd MMM yyyy} - ${b.TotalPrice:F2}\n";
+                totalRevenue += b.TotalPrice;
+            }
+            message += $"\nTotal Revenue: ${totalRevenue:F2}";
+            MessageBox.Show(message, "Room Bookings");
         }
 
         private static bool ConfirmDelete(string name) =>

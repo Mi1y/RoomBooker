@@ -58,6 +58,7 @@ namespace RoomBooker.desktop
             {
                 case "colEdit": _controller.HandleCustomerEdit(customer); break;
                 case "colDelete": _controller.HandleCustomerDelete(customer); break;
+                case "colViewBookings": _controller.ShowCustomerBookings(customer); break;
             }
         }
 
@@ -72,6 +73,7 @@ namespace RoomBooker.desktop
             {
                 case "colEdit": _controller.HandleRoomEdit(room); break;
                 case "colDelete": _controller.HandleRoomDelete(room); break;
+                case "colViewBookings": _controller.ShowRoomBookings(room); break;
             }
         }
 
@@ -87,6 +89,11 @@ namespace RoomBooker.desktop
                 case "colEdit": _controller.HandleBookingEdit(booking); break;
                 case "colDelete": _controller.HandleBookingDelete(booking); break;
             }
+        }
+
+        private void tabPageCustomers_Click(object sender, EventArgs e)
+        {
+
         }
     }
 }

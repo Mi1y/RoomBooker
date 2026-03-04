@@ -1,4 +1,5 @@
-﻿using RoomBooker.Data;
+﻿using Microsoft.EntityFrameworkCore;
+using RoomBooker.Data;
 using RoomBooker.Models;
 
 namespace RoomBooker.desktop.Features
@@ -37,5 +38,30 @@ namespace RoomBooker.desktop.Features
                 _loadData();
             }
         }
+
+        public int GetRoomBookingCount(int roomId)
+        {
+            return _context.Bookings.Count(b => b.RoomId == roomId);
+        }
+
+        public List<RoomBookingInfo> GetRoomBookingDetails(int roomId)
+        {
+            var room = _context.Rooms.Find(roomId);
+            return _context.Bookings
+                .Where(b => b.RoomId == roomId)
+                .Include(b => b.Customer)
+                .Select(b => new RoomBookingInfo(
+                    b.Id,
+                    b.Customer!.Name,
+                    b.DateFrom,
+                    b.DateTo,
+                    b.DateFrom.HasValue && b.DateTo.HasValue 
+                        ? (decimal)(b.DateTo.Value.DayNumber - b.DateFrom.Value.DayNumber) * room!.PricePerNight
+                        : 0
+                ))
+                .ToList();
+        }
     }
+
+    public record RoomBookingInfo(int BookingId, string CustomerName, DateOnly? DateFrom, DateOnly? DateTo, decimal TotalPrice);
 }
