@@ -73,10 +73,10 @@
             tabControl1.Controls.Add(tabPageCustomers);
             tabControl1.Controls.Add(tabPageRooms);
             tabControl1.Controls.Add(tabPageBookings);
-            tabControl1.Location = new Point(37, 48);
+            tabControl1.Location = new Point(2, 2);
             tabControl1.Name = "tabControl1";
             tabControl1.SelectedIndex = 0;
-            tabControl1.Size = new Size(944, 473);
+            tabControl1.Size = new Size(1200, 800);
             tabControl1.TabIndex = 1;
             // 
             // tabPageCustomers
@@ -89,7 +89,6 @@
             tabPageCustomers.TabIndex = 0;
             tabPageCustomers.Text = "Customers";
             tabPageCustomers.UseVisualStyleBackColor = true;
-            tabPageCustomers.Click += tabPageCustomers_Click;
             // 
             // dataGridView1
             // 
@@ -119,7 +118,6 @@
             tabPageRooms.TabIndex = 1;
             tabPageRooms.Text = "Rooms";
             tabPageRooms.UseVisualStyleBackColor = true;
-            tabPageRooms.Click += tabControl_Click;
             // 
             // dataGridView2
             // 
@@ -189,7 +187,6 @@
             tabPageBookings.TabIndex = 1;
             tabPageBookings.Text = "Bookings";
             tabPageBookings.UseVisualStyleBackColor = true;
-            tabPageBookings.Click += tabControl_Click;
             // 
             // dataGridView3
             // 
@@ -309,7 +306,7 @@
             // 
             AutoScaleDimensions = new SizeF(8F, 20F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(1600, 920);
+            ClientSize = new Size(1200, 800);
             Controls.Add(tabControl1);
             Name = "MainForm";
             Text = "RoomBooker";
