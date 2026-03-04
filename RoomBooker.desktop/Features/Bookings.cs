@@ -1,45 +1,41 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using RoomBooker.Data;
 using RoomBooker.Models;
-using RoomBooker_Desktop.Dialog;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
-namespace RoomBooker_Desktop
+namespace RoomBooker.desktop.Features
 {
-    public partial class MainForm
+    internal sealed class BookingsFeature
     {
-        private void AddBooking()
+        private readonly AppDbContext _context;
+        private readonly Action _loadData;
+
+        public BookingsFeature(AppDbContext context, Action loadData)
         {
-            using var dialog = new BookingDialog(_context.Customers.ToList(), _context.Rooms.ToList());
-            if (dialog.ShowDialog(this) != DialogResult.OK) return;
-            _context.Bookings.Add(dialog.Booking);
-            _context.SaveChanges();
-            LoadData();
+            _context = context;
+            _loadData = loadData;
         }
 
-        private void EditBooking()
+        public void Add(Booking booking)
         {
-            if (bookingBindingSource.Current is not Booking selected) return;
-            var booking = _context.Bookings.Find(selected.Id);
-            if (booking is null) return;
-
-            using var dialog = new BookingDialog(_context.Customers.ToList(), _context.Rooms.ToList(), booking);
-            if (dialog.ShowDialog(this) != DialogResult.OK) return;
+            _context.Bookings.Add(booking);
             _context.SaveChanges();
-            LoadData();
+            _loadData();
         }
 
-        private void DeleteBooking()
+        public void Edit(Booking booking)
         {
-            if (bookingBindingSource.Current is not Booking selected) return;
-            if (!ConfirmDelete($"Booking #{selected.Id}")) return;
-
-            var booking = _context.Bookings.Find(selected.Id);
-            if (booking is null) return;
-            _context.Bookings.Remove(booking);
             _context.SaveChanges();
-            LoadData();
+            _loadData();
+        }
+
+        public void Delete(int bookingId)
+        {
+            var booking = _context.Bookings.Find(bookingId);
+            if (booking is not null)
+            {
+                _context.Bookings.Remove(booking);
+                _context.SaveChanges();
+                _loadData();
+            }
         }
     }
 }

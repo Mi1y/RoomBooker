@@ -1,45 +1,41 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using RoomBooker.Data;
 using RoomBooker.Models;
-using RoomBooker_Desktop.Dialog;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
-namespace RoomBooker_Desktop
+namespace RoomBooker.desktop.Features
 {
-    public partial class MainForm
+    internal sealed class RoomsFeature
     {
-        private void AddRoom()
+        private readonly AppDbContext _context;
+        private readonly Action _loadData;
+
+        public RoomsFeature(AppDbContext context, Action loadData)
         {
-            using var dialog = new RoomDialog();
-            if (dialog.ShowDialog(this) != DialogResult.OK) return;
-            _context.Rooms.Add(dialog.Room);
-            _context.SaveChanges();
-            LoadData();
+            _context = context;
+            _loadData = loadData;
         }
 
-        private void EditRoom()
+        public void Add(Room room)
         {
-            if (roomBindingSource.Current is not Room selected) return;
-            var room = _context.Rooms.Find(selected.ID);
-            if (room is null) return;
-
-            using var dialog = new RoomDialog(room);
-            if (dialog.ShowDialog(this) != DialogResult.OK) return;
+            _context.Rooms.Add(room);
             _context.SaveChanges();
-            LoadData();
+            _loadData();
         }
 
-        private void DeleteRoom()
+        public void Edit(Room room)
         {
-            if (roomBindingSource.Current is not Room selected) return;
-            if (!ConfirmDelete($"Room {selected.RoomNumber}")) return;
-
-            var room = _context.Rooms.Find(selected.ID);
-            if (room is null) return;
-            _context.Rooms.Remove(room);
             _context.SaveChanges();
-            LoadData();
+            _loadData();
+        }
+
+        public void Delete(int roomId)
+        {
+            var room = _context.Rooms.Find(roomId);
+            if (room is not null)
+            {
+                _context.Rooms.Remove(room);
+                _context.SaveChanges();
+                _loadData();
+            }
         }
     }
 }

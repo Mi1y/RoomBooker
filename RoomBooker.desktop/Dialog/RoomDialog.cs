@@ -1,6 +1,6 @@
 using RoomBooker.Models;
 
-namespace RoomBooker_Desktop.Dialog
+namespace RoomBooker.desktop.Dialog
 {
     public class RoomDialog : Form
     {

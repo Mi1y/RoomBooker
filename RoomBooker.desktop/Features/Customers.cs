@@ -1,46 +1,41 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using RoomBooker.Data;
 using RoomBooker.Models;
-using RoomBooker_Desktop.Dialog;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
-namespace RoomBooker_Desktop
+namespace RoomBooker.desktop.Features
 {
-    public partial class MainForm
+    internal sealed class CustomersFeature
     {
+        private readonly AppDbContext _context;
+        private readonly Action _loadData;
 
-        private void AddCustomer()
+        public CustomersFeature(AppDbContext context, Action loadData)
         {
-            using var dialog = new CustomerDialog();
-            if (dialog.ShowDialog(this) != DialogResult.OK) return;
-            _context.Customers.Add(dialog.Customer);
-            _context.SaveChanges();
-            LoadData();
+            _context = context;
+            _loadData = loadData;
         }
 
-        private void EditCustomer()
+        public void Add(Customer customer)
         {
-            if (customerBindingSource.Current is not Customer selected) return;
-            var customer = _context.Customers.Find(selected.Id);
-            if (customer is null) return;
-
-            using var dialog = new CustomerDialog(customer);
-            if (dialog.ShowDialog(this) != DialogResult.OK) return;
+            _context.Customers.Add(customer);
             _context.SaveChanges();
-            LoadData();
+            _loadData();
         }
 
-        private void DeleteCustomer()
+        public void Edit(Customer customer)
         {
-            if (customerBindingSource.Current is not Customer selected) return;
-            if (!ConfirmDelete(selected.Name)) return;
-
-            var customer = _context.Customers.Find(selected.Id);
-            if (customer is null) return;
-            _context.Customers.Remove(customer);
             _context.SaveChanges();
-            LoadData();
+            _loadData();
+        }
+
+        public void Delete(int customerId)
+        {
+            var customer = _context.Customers.Find(customerId);
+            if (customer is not null)
+            {
+                _context.Customers.Remove(customer);
+                _context.SaveChanges();
+                _loadData();
+            }
         }
     }
 }

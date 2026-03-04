@@ -1,6 +1,6 @@
 using RoomBooker.Models;
 
-namespace RoomBooker_Desktop.Dialog
+namespace RoomBooker.desktop.Dialog
 {
     public class CustomerDialog : Form
     {
@@ -51,6 +51,7 @@ namespace RoomBooker_Desktop.Dialog
                     MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     return;
                 }
+
                 Customer.Name = txtName.Text.Trim();
                 Customer.Email = txtEmail.Text.Trim();
                 Customer.Phone = txtPhone.Text.Trim();

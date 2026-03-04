@@ -1,4 +1,4 @@
-namespace RoomBooker_Desktop
+namespace RoomBooker.desktop
 {
     internal static class Program
     {

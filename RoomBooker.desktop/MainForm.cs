@@ -9,17 +9,27 @@ using System.Windows.Forms;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using RoomBooker.Data;
+using RoomBooker.Models;
+using RoomBooker.desktop.Features;
+using RoomBooker.desktop.Dialog;
 
-namespace RoomBooker_Desktop
+namespace RoomBooker.desktop
 {
     public partial class MainForm : Form
     {
         private readonly AppDbContext _context;
+        private readonly BookingsFeature _bookings;
+        private readonly CustomersFeature _customers;
+        private readonly RoomsFeature _rooms;
+
         public MainForm()
         {
             InitializeComponent();
             SetupDataGridButtons();
             _context = CreateDbContext();
+            _customers = new CustomersFeature(_context, LoadData);
+            _rooms = new RoomsFeature(_context, LoadData);
+            _bookings = new BookingsFeature(_context, LoadData);
             LoadData();
         }
         private static AppDbContext CreateDbContext()
@@ -87,16 +97,30 @@ namespace RoomBooker_Desktop
         {
             switch (tabControl1.SelectedIndex)
             {
-                case 0: AddCustomer(); break;
-                case 1: AddRoom(); break;
-                case 2: AddBooking(); break;
+                case 0:
+                    using (var dialog = new CustomerDialog())
+                    {
+                        if (dialog.ShowDialog(this) == DialogResult.OK)
+                            _customers.Add(dialog.Customer);
+                    }
+                    break;
+                case 1:
+                    using (var dialog = new RoomDialog())
+                    {
+                        if (dialog.ShowDialog(this) == DialogResult.OK)
+                            _rooms.Add(dialog.Room);
+                    }
+                    break;
+                case 2:
+                    using (var dialog = new BookingDialog(_context.Customers.ToList(), _context.Rooms.ToList()))
+                    {
+                        if (dialog.ShowDialog(this) == DialogResult.OK)
+                            _bookings.Add(dialog.Booking);
+                    }
+                    break;
             }
         }
 
-
-        private static bool ConfirmDelete(string name) =>
-            MessageBox.Show($"Delete \"{name}\"?", "Confirm",
-                MessageBoxButtons.YesNo, MessageBoxIcon.Warning) == DialogResult.Yes;
 
         protected override void OnFormClosed(FormClosedEventArgs e)
         {
@@ -119,10 +143,21 @@ namespace RoomBooker_Desktop
             if (e.RowIndex < 0) return;
             dataGridView1.CommitEdit(DataGridViewDataErrorContexts.Commit);
 
+            if (dataGridView1.CurrentRow?.DataBoundItem is not Customer customer) return;
+
             switch (dataGridView1.Columns[e.ColumnIndex].Name)
             {
-                case "colEdit": EditCustomer(); break;
-                case "colDelete": DeleteCustomer(); break;
+                case "colEdit":
+                    using (var dialog = new CustomerDialog(customer))
+                    {
+                        if (dialog.ShowDialog(this) == DialogResult.OK)
+                            _customers.Edit(customer);
+                    }
+                    break;
+                case "colDelete":
+                    if (ConfirmDelete(customer.Name))
+                        _customers.Delete(customer.Id);
+                    break;
             }
         }
 
@@ -131,10 +166,21 @@ namespace RoomBooker_Desktop
             if (e.RowIndex < 0) return;
             dataGridView2.CommitEdit(DataGridViewDataErrorContexts.Commit);
 
+            if (dataGridView2.CurrentRow?.DataBoundItem is not Room room) return;
+
             switch (dataGridView2.Columns[e.ColumnIndex].Name)
             {
-                case "colEdit": EditRoom(); break;
-                case "colDelete": DeleteRoom(); break;
+                case "colEdit":
+                    using (var dialog = new RoomDialog(room))
+                    {
+                        if (dialog.ShowDialog(this) == DialogResult.OK)
+                            _rooms.Edit(room);
+                    }
+                    break;
+                case "colDelete":
+                    if (ConfirmDelete($"Room {room.RoomNumber}"))
+                        _rooms.Delete(room.ID);
+                    break;
             }
         }
 
@@ -143,11 +189,26 @@ namespace RoomBooker_Desktop
             if (e.RowIndex < 0) return;
             dataGridView3.CommitEdit(DataGridViewDataErrorContexts.Commit);
 
+            if (dataGridView3.CurrentRow?.DataBoundItem is not Booking booking) return;
+
             switch (dataGridView3.Columns[e.ColumnIndex].Name)
             {
-                case "colEdit": EditBooking(); break;
-                case "colDelete": DeleteBooking(); break;
+                case "colEdit":
+                    using (var dialog = new BookingDialog(_context.Customers.ToList(), _context.Rooms.ToList(), booking))
+                    {
+                        if (dialog.ShowDialog(this) == DialogResult.OK)
+                            _bookings.Edit(booking);
+                    }
+                    break;
+                case "colDelete":
+                    if (ConfirmDelete($"Booking #{booking.Id}"))
+                        _bookings.Delete(booking.Id);
+                    break;
             }
         }
+
+        private static bool ConfirmDelete(string name) =>
+            MessageBox.Show($"Delete \"{name}\"?", "Confirm",
+                MessageBoxButtons.YesNo, MessageBoxIcon.Warning) == DialogResult.Yes;
     }
 }
