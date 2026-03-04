@@ -112,7 +112,8 @@ namespace RoomBooker.desktop
                     }
                     break;
                 case 2:
-                    using (var dialog = new BookingDialog(_context.Customers.ToList(), _context.Rooms.ToList()))
+                    var allBookings = _context.Bookings.Include(b => b.Customer).ToList();
+                    using (var dialog = new BookingDialog(_context.Customers.ToList(), _context.Rooms.ToList(), allBookings))
                     {
                         if (dialog.ShowDialog(this) == DialogResult.OK)
                             _bookings.Add(dialog.Booking);
@@ -194,7 +195,8 @@ namespace RoomBooker.desktop
             switch (dataGridView3.Columns[e.ColumnIndex].Name)
             {
                 case "colEdit":
-                    using (var dialog = new BookingDialog(_context.Customers.ToList(), _context.Rooms.ToList(), booking))
+                    var allBookings = _context.Bookings.Include(b => b.Customer).ToList();
+                    using (var dialog = new BookingDialog(_context.Customers.ToList(), _context.Rooms.ToList(), allBookings, booking))
                     {
                         if (dialog.ShowDialog(this) == DialogResult.OK)
                             _bookings.Edit(booking);

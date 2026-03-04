@@ -8,12 +8,17 @@ namespace RoomBooker.desktop.Dialog
         private readonly ComboBox cboRoom;
         private readonly DateTimePicker dtpFrom;
         private readonly DateTimePicker dtpTo;
+        private readonly IList<Booking> _allBookings;
 
         public Booking Booking { get; }
 
-        public BookingDialog(IList<Customer> customers, IList<Room> rooms, Booking? existing = null)
+        public BookingDialog(IList<Customer> customers, IList<Room> rooms, IList<Booking> allBookings, 
+            Booking? existing = null
+            )
         {
             Booking = existing ?? new Booking();
+            _allBookings = allBookings;
+
             Text = Booking.Id == 0 ? "Add Booking" : "Edit Booking";
             Size = new Size(380, 255);
             StartPosition = FormStartPosition.CenterParent;
@@ -74,10 +79,32 @@ namespace RoomBooker.desktop.Dialog
                     MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     return;
                 }
+
+                var selectedRoomId = (int)cboRoom.SelectedValue;
+                var newFrom = DateOnly.FromDateTime(dtpFrom.Value);
+                var newTo = DateOnly.FromDateTime(dtpTo.Value);
+
+                var conflict = _allBookings.FirstOrDefault(b =>
+                    b.RoomId == selectedRoomId &&
+                    b.Id != Booking.Id &&
+                    b.DateFrom < newTo &&
+                    b.DateTo > newFrom);
+
+                if (conflict is not null)
+                {
+                    var who = conflict.Customer?.Name ?? $"Customer #{conflict.CustomerId}";
+                    var from = conflict.DateFrom?.ToString("dd MMM yyyy") ?? "?";
+                    var to = conflict.DateTo?.ToString("dd MMM yyyy") ?? "?";
+                    MessageBox.Show(
+                        $"Room is already booked from {from} to {to} by {who}.",
+                        "Booking Conflict", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
+                }
+
                 Booking.CustomerId = (int)cboCustomer.SelectedValue;
-                Booking.RoomId = (int)cboRoom.SelectedValue;
-                Booking.DateFrom = DateOnly.FromDateTime(dtpFrom.Value);
-                Booking.DateTo = DateOnly.FromDateTime(dtpTo.Value);
+                Booking.RoomId = selectedRoomId;
+                Booking.DateFrom = newFrom;
+                Booking.DateTo = newTo;
                 DialogResult = DialogResult.OK;
             };
 
