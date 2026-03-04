@@ -1,4 +1,5 @@
 using RoomBooker.Models;
+using System.Text.RegularExpressions;
 
 namespace RoomBooker.desktop.Dialog
 {
@@ -43,12 +44,28 @@ namespace RoomBooker.desktop.Dialog
             var btnSave = new Button { Text = "Save", Width = 75 };
             var btnCancel = new Button { Text = "Cancel", DialogResult = DialogResult.Cancel };
 
+            txtPhone.KeyPress += (_, e) =>
+            {
+                if (!char.IsDigit(e.KeyChar) && e.KeyChar != '\b' &&
+                    e.KeyChar != '+' && e.KeyChar != '-' &&
+                    e.KeyChar != ' ' && e.KeyChar != '(' && e.KeyChar != ')')
+                    e.Handled = true;
+            };
+
             btnSave.Click += (_, _) =>
             {
                 if (string.IsNullOrWhiteSpace(txtName.Text))
                 {
                     MessageBox.Show("Name is required.", "Validation",
                     MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
+                }
+
+                var digitsOnly = Regex.Replace(txtPhone.Text, @"\D", "");
+                if (!string.IsNullOrEmpty(txtPhone.Text.Trim()) && digitsOnly.Length < 7)
+                {
+                    MessageBox.Show("Phone must contain at least 7 digits.", "Validation",
+                        MessageBoxButtons.OK, MessageBoxIcon.Warning);
                     return;
                 }
 
